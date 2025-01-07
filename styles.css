@@ -6,3 +6,70 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+body {
+  --chat-clips-gap-spacing: var(--size-4-2);
+}
+/* callouts */
+.callout[data-callout="comments"] {
+  background-color: transparent;
+  --callout-icon: messages-square;
+  padding: 0;
+}
+.callout[data-callout="comments"] > .callout-title {
+  padding-left: var(--chat-clips-gap-spacing);
+}
+.callout[data-callout="comment"] {
+  --callout-color: var(--callout-quote);
+  --callout-icon: message-circle;
+}
+.callout[data-callout="reply"] {
+  --callout-color: var(--callout-quote);
+  --callout-icon: reply;
+}
+/* title adjustment (ref: https://forum.obsidian.md/t/callouts-without-title/50547) */
+.callout[data-callout="comment"],
+.callout[data-callout="reply"],
+.callout[data-callout-metadata*="badge"] {
+  /* align icon and content side-by-side */
+  display: flex;
+  align-items: flex-start;
+  padding: var(--chat-clips-gap-spacing);
+  width: fit-content;
+  /* hide title */
+  /* remove top and bottom margins and add left margin */
+  /* v-align icon in center of first line */
+}
+.callout[data-callout="comment"] .callout-title-inner,
+.callout[data-callout="reply"] .callout-title-inner,
+.callout[data-callout-metadata*="badge"] .callout-title-inner {
+  display: none;
+}
+.callout[data-callout="comment"] > .callout-content p,
+.callout[data-callout="reply"] > .callout-content p,
+.callout[data-callout-metadata*="badge"] > .callout-content p {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-left: var(--chat-clips-gap-spacing);
+}
+.callout[data-callout="comment"] > .callout-title,
+.callout[data-callout="reply"] > .callout-title,
+.callout[data-callout-metadata*="badge"] > .callout-title {
+  line-height: inherit;
+}
+.callout[data-callout="comment"] > .callout-title,
+.callout[data-callout="reply"] > .callout-title,
+.callout[data-callout-metadata*="badge"] > .callout-title,
+.callout[data-callout="comment"] > .callout-icon,
+.callout[data-callout="reply"] > .callout-icon,
+.callout[data-callout-metadata*="badge"] > .callout-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.callout[data-callout-metadata="page"] > .callout-title > .callout-title-inner:before {
+  content: "p. ";
+}
+/* other hooks */
+div:has( > [data-heading="chat-clips"] + .chat-clips-div) + .el-ol {
+  display: none;
+}

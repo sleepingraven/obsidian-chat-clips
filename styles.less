@@ -1,0 +1,82 @@
+/*
+
+This CSS file will be included with your plugin, and
+available in the app when your plugin is enabled.
+
+If your plugin does not need CSS, delete this file.
+
+*/
+
+@base-name: chat-clips;
+@start-mark: chat-clips;
+
+@data-callout-comments: comments;
+@data-callout-comment: comment;
+@data-callout-reply: reply;
+@data-callout-metadata-page: page;
+
+body {
+	--chat-clips-gap-spacing: var(--size-4-2);
+}
+
+/* callouts */
+
+.callout[data-callout="@{data-callout-comments}"] {
+	background-color: transparent;
+	--callout-icon: messages-square;
+	padding: 0;
+	& > .callout-title {
+		padding-left: var(--chat-clips-gap-spacing);
+	}
+}
+.callout[data-callout="@{data-callout-comment}"] {
+	--callout-color: var(--callout-quote);
+	--callout-icon: message-circle;
+}
+.callout[data-callout="@{data-callout-reply}"] {
+	--callout-color: var(--callout-quote);
+	--callout-icon: reply;
+}
+
+/* title adjustment (ref: https://forum.obsidian.md/t/callouts-without-title/50547) */
+
+.callout[data-callout="@{data-callout-comment}"],
+.callout[data-callout="@{data-callout-reply}"],
+.callout[data-callout-metadata*="badge"] {
+	/* align icon and content side-by-side */
+	display: flex;
+	align-items: flex-start;
+	padding: var(--chat-clips-gap-spacing);
+	width: fit-content;
+	/* hide title */
+	.callout-title-inner {
+		display: none;
+	}
+	/* remove top and bottom margins and add left margin */
+	& > .callout-content p {
+		margin-block-start: 0;
+		margin-block-end: 0;
+		margin-left: var(--chat-clips-gap-spacing);
+	}
+	& > .callout-title {
+		line-height: inherit;
+	}
+	/* v-align icon in center of first line */
+	& > .callout-title,
+	& > .callout-icon {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+}
+.callout[data-callout-metadata="@{data-callout-metadata-page}"] {
+	& > .callout-title > .callout-title-inner:before {
+		content: "p. ";
+	}
+}
+
+/* other hooks */
+
+div:has(> [data-heading="@{start-mark}"] + .@{base-name}-div) + .el-ol {
+	display: none;
+}
