@@ -69,7 +69,3 @@ body {
 .callout[data-callout-metadata="page"] > .callout-title > .callout-title-inner:before {
   content: "p. ";
 }
-/* other hooks */
-div:has( > [data-heading="chat-clips"] + .chat-clips-div) + .el-ol {
-  display: none;
-}

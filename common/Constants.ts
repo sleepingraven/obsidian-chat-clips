@@ -9,15 +9,15 @@
 
 export enum Constants {
 	BASE_NAME = "chat-clips",
-	START_MARK = `${BASE_NAME}`,
+	CHAT_CLIPS_MARKUP_CLS = `${BASE_NAME}-start`,
 
 	DATA_CALLOUT_COMMENTS = "comments",
 	DATA_CALLOUT_COMMENT = "comment",
 	DATA_CALLOUT_REPLY = "reply",
 	DATA_CALLOUT_METADATA_PAGE = "page",
 
-	DATA_HEADING_ATTR = "data-heading",
 	EL_DIV_CLS = "el-div",
+	EL_OL_CLS = "el-ol",
 	CHAT_CLIPS_CONTAINER_CLS = `${BASE_NAME}-div`,
 	PANE_EMPTY_CLS_FOR_RIGHT_SIDEBAR = "pane-empty",
 }

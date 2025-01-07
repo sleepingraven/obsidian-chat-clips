@@ -8,7 +8,6 @@ If your plugin does not need CSS, delete this file.
 */
 
 @base-name: chat-clips;
-@start-mark: chat-clips;
 
 @data-callout-comments: comments;
 @data-callout-comment: comment;
@@ -73,10 +72,4 @@ body {
 	& > .callout-title > .callout-title-inner:before {
 		content: "p. ";
 	}
-}
-
-/* other hooks */
-
-div:has(> [data-heading="@{start-mark}"] + .@{base-name}-div) + .el-ol {
-	display: none;
 }

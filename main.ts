@@ -80,49 +80,50 @@ export default class ChatClipsPlugin extends Plugin {
 		});
 
 		this.registerMarkdownPostProcessor(async (element, context) => {
-			if (!resolver.getTargetMarkdown().length) {
-				return;
-			}
-			const ccHeadings = element.findAll(
-				`[${Constants.DATA_HEADING_ATTR}="${Constants.START_MARK}"]`
+			const ccOls = element.findAll(
+				`ol:has( > li:first-child span.${Constants.CHAT_CLIPS_MARKUP_CLS})`
 			);
-			if (!ccHeadings.length) {
-				return;
+			let elsToRender: HTMLElement[];
+			if (ccOls.length) {
+				elsToRender = ccOls
+					.map((ol) => ol.parentElement)
+					.filter((parentElement) => parentElement !== null)
+					.map((parentElement) => {
+						parentElement.empty();
+						parentElement.removeClass(Constants.EL_OL_CLS);
+						parentElement.addClasses([Constants.EL_DIV_CLS]);
+						return parentElement.createDiv({
+							cls: [Constants.CHAT_CLIPS_CONTAINER_CLS],
+						});
+					});
+			} else {
+				const ccDivs = element.findAll(
+					`.${Constants.CHAT_CLIPS_CONTAINER_CLS}`
+				);
+				if (ccDivs.length) {
+					elsToRender = ccDivs;
+				} else {
+					return;
+				}
 			}
 			console.log(
 				`${Constants.BASE_NAME}: rendering ${context.sourcePath}`
 			);
-			await Promise.all(
-				ccHeadings
-					.map((h) => h.parentElement)
-					.filter((p) => p !== null)
-					.map(async (p) => {
-						const el = createDiv({
-							cls: [
-								Constants.EL_DIV_CLS,
-								Constants.CHAT_CLIPS_CONTAINER_CLS,
-							],
-						});
-						p.appendChild(el);
-						await MarkdownRenderer.render(
-							this.app,
-							resolver.getTargetMarkdown(),
-							el,
-							context.sourcePath,
-							this
-						);
-					})
-			);
+			for (const el of elsToRender) {
+				await MarkdownRenderer.render(
+					this.app,
+					resolver.getTargetMarkdown(),
+					el,
+					context.sourcePath,
+					this
+				);
+			}
 		});
 
 		this.registerEvent(
 			workspace.on(
 				"active-leaf-change",
-				// await resolver.resolveLeaf.bind(resolver)
-				async (leaf) => {
-					console.log(`${Constants.BASE_NAME}: active event`);
-					await resolver.resolveLeaf(leaf);
-				}
+				await resolver.resolveLeaf.bind(resolver)
 			)
 		);
 		this.registerEvent(

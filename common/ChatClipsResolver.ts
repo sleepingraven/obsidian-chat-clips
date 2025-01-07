@@ -86,6 +86,7 @@ export class ChatClipsResolver {
 			file: file,
 			targetMarkdown: this.doResolveMarkdown(sourceMarkdown).trimEnd(),
 		};
+		// console.log(cache.targetMarkdown);
 		await this.iterateTasks(cache);
 	}
 
@@ -105,9 +106,8 @@ export class ChatClipsResolver {
 	 * todo recognize by codemirror
 	 */
 	doResolveMarkdown(content: string): string {
-		const startMarkHeadingContent = Constants.START_MARK;
 		const pattern = new RegExp(
-			`^#+ +${startMarkHeadingContent}$\\s*$[\\r\\n]`,
+			`^\\d+\\. +<span\\b[^>]*\\bclass="${Constants.CHAT_CLIPS_MARKUP_CLS}"[^>]*>.*\\s*^`,
 			"m"
 		);
 		const contentMatch = pattern.exec(content);
@@ -117,7 +117,7 @@ export class ChatClipsResolver {
 
 		let output = "";
 		const startPos = contentMatch.index + contentMatch[0].length;
-		const lineRegex = /^([\t ]*)(([-+*]|((\d+)\.)) (.+))?$/gm;
+		const lineRegex = /^([\t ]*)(([-+*]|((\d+)\.)) (.+))?$\s*^/gm;
 		lineRegex.lastIndex = startPos;
 		for (let lineMatch; (lineMatch = lineRegex.exec(content)) !== null; ) {
 			const [line, indents, item, marker, , markerNum, itemContent] =
@@ -133,11 +133,11 @@ export class ChatClipsResolver {
 			if (markerNum) {
 				output += `${prefix}[!${Constants.DATA_CALLOUT_COMMENTS}|${Constants.DATA_CALLOUT_METADATA_PAGE}]+ ${markerNum}`;
 			} else {
-				const calloutTpe =
+				const calloutType =
 					indentlevel <= 2
 						? Constants.DATA_CALLOUT_COMMENT
 						: Constants.DATA_CALLOUT_REPLY;
-				output += `${prefix}[!${calloutTpe}]\n${prefix}${itemContent}`;
+				output += `${prefix}[!${calloutType}]\n${prefix}${itemContent}`;
 			}
 			output += "\n";
 		}
