@@ -37,23 +37,21 @@ export class ChatClipsResolver {
 		return this.cache.targetMarkdown;
 	}
 
-	prepare() {
+	async prepare() {
 		const { workspace } = this.app;
-		// may be null before workspace.onLayoutReady
+		// may be null before workspace.onLayoutReady()
 		const leaf = workspace.getMostRecentLeaf(workspace.rootSplit);
-		if (
-			leaf?.view instanceof MarkdownView &&
-			this.cache.targetMarkdown.length
-		) {
+		if (leaf?.view instanceof MarkdownView) {
 			const { view } = leaf;
-			if (view.getMode() === "preview" && view?.file?.path) {
-				console.log(
-					`${Constants.BASE_NAME}: rerendering ${view.file.path}`
-				);
+			if (view.getMode() === "preview") {
+				await this.resolveLeaf(leaf);
+				if (!this.cache.targetMarkdown.length) {
+					return;
+				}
+				console.log(`${Constants.BASE_NAME}: rerendering`);
 				leaf.view.previewMode.rerender(true);
 			}
 		}
-		return;
 	}
 
 	async resolveLeaf(leaf: WorkspaceLeaf | null) {
@@ -77,6 +75,9 @@ export class ChatClipsResolver {
 			new Notice("Chat Clips: No associated file found!");
 			return;
 		}
+		if (view.file === this.cache.file) {
+			return;
+		}
 		await this.resolveMarkdown(view.file, view.editor.getValue());
 	}
 
@@ -86,7 +87,6 @@ export class ChatClipsResolver {
 			file: file,
 			targetMarkdown: this.doResolveMarkdown(sourceMarkdown).trimEnd(),
 		};
-		// console.log(cache.targetMarkdown);
 		await this.iterateTasks(cache);
 	}
 

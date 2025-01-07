@@ -30,11 +30,7 @@ import { ChatClipsResolver } from "common/ChatClipsResolver";
 /* (ref: https://forum.obsidian.md/t/is-there-a-pre-render-pre-processor-callback/72530) */
 
 /**
- * tofix If we use heading like "## chat-clips" to indicate, without mark in the list, then in preview mode we must append the output element to the heading, however,
- * - if we hide the following list use css, the scroll goes wrong;
- * - if we edit the list, it doesn't rerender.
- *
- * tofix lists with an empty line merges to one list.
+ * tofix if we edit the list mark number, it doesn't rerender.
  */
 export default class ChatClipsPlugin extends Plugin {
 	private settings: ChatClipsPluginSettings;
@@ -43,35 +39,50 @@ export default class ChatClipsPlugin extends Plugin {
 		const { workspace } = this.app;
 		await this.loadSettings();
 
-		const resolver = new ChatClipsResolver(this.app);
-		resolver.tasks.contentResolved.push((cache, presentCache) =>
-			this.applyToView(async (view) => {
-				const setViewDisplayText = cache.file !== presentCache.file;
-				if (cache.targetMarkdown.length) {
-					if (!cache.file) {
-						return;
-					}
-					await view.renderMarkdown(
-						cache.targetMarkdown,
-						normalizePath(cache.file.path)
-					);
-				} else {
-					if (presentCache.targetMarkdown.length) {
-						await view.displayDefaultContent();
-					}
-				}
-				if (setViewDisplayText) {
-					await view.setDisplayTextFor(cache?.file?.basename);
-				}
-			})
-		);
-
 		this.registerView(
 			CHAT_CLIPS_RIGHT_SIDEBAR_VIEW_TYPE,
 			(leaf) => new ChatClipsRightSidebarView(leaf)
 		);
+
+		const resolver = new ChatClipsResolver(this.app);
 		workspace.onLayoutReady(async () => {
-			resolver.prepare();
+			resolver.tasks.contentResolved.push((cache, presentCache) =>
+				this.applyToView(async (view) => {
+					const setViewDisplayText = cache.file !== presentCache.file;
+					if (cache.targetMarkdown.length) {
+						if (!cache.file) {
+							return;
+						}
+						await view.renderMarkdown(
+							cache.targetMarkdown,
+							normalizePath(cache.file.path)
+						);
+					} else {
+						if (presentCache.targetMarkdown.length) {
+							await view.displayDefaultContent();
+						}
+					}
+					if (setViewDisplayText) {
+						await view.setDisplayTextFor(cache?.file?.basename);
+					}
+				})
+			);
+
+			await resolver.prepare();
+			// outside workspace.onLayoutReady() provides empty editor value
+			this.registerEvent(
+				workspace.on(
+					"active-leaf-change",
+					await resolver.resolveLeaf.bind(resolver)
+				)
+			);
+			this.registerEvent(
+				workspace.on(
+					"quick-preview",
+					await resolver.resolveMarkdown.bind(resolver)
+				)
+			);
+
 			await workspace.ensureSideLeaf(
 				CHAT_CLIPS_RIGHT_SIDEBAR_VIEW_TYPE,
 				"right",
@@ -119,19 +130,6 @@ export default class ChatClipsPlugin extends Plugin {
 				);
 			}
 		});
-
-		this.registerEvent(
-			workspace.on(
-				"active-leaf-change",
-				await resolver.resolveLeaf.bind(resolver)
-			)
-		);
-		this.registerEvent(
-			workspace.on(
-				"quick-preview",
-				await resolver.resolveMarkdown.bind(resolver)
-			)
-		);
 
 		// this.addSettingTab(new ChatClipsSettingTab(this.app, this));
 	}
