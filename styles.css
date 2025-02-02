@@ -49,7 +49,12 @@ body {
 .callout[data-callout-metadata*="badge"] > .callout-content p {
   margin-block-start: 0;
   margin-block-end: 0;
-  margin-left: var(--chat-clips-gap-spacing);
+  margin-inline-start: var(--chat-clips-gap-spacing);
+}
+.callout[data-callout="comment"] > .callout-content p:not(:first-child),
+.callout[data-callout="reply"] > .callout-content p:not(:first-child),
+.callout[data-callout-metadata*="badge"] > .callout-content p:not(:first-child) {
+  margin-block-start: var(--chat-clips-gap-spacing);
 }
 .callout[data-callout="comment"] > .callout-title,
 .callout[data-callout="reply"] > .callout-title,

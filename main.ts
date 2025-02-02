@@ -30,7 +30,8 @@ import { ChatClipsResolver } from "common/ChatClipsResolver";
 /* (ref: https://forum.obsidian.md/t/is-there-a-pre-render-pre-processor-callback/72530) */
 
 /**
- * tofix if we edit the list mark number, it doesn't rerender.
+ * tofix if we edit the list mark number, it doesn't rerender
+ * tofix must start by "<span" in 1st item
  */
 export default class ChatClipsPlugin extends Plugin {
 	private settings: ChatClipsPluginSettings;
@@ -49,7 +50,7 @@ export default class ChatClipsPlugin extends Plugin {
 			resolver.tasks.contentResolved.push((cache, presentCache) =>
 				this.applyToView(async (view) => {
 					const setViewDisplayText = cache.file !== presentCache.file;
-					if (cache.targetMarkdown.length) {
+					if (cache.targetMarkdown) {
 						if (!cache.file) {
 							return;
 						}
@@ -58,7 +59,7 @@ export default class ChatClipsPlugin extends Plugin {
 							normalizePath(cache.file.path)
 						);
 					} else {
-						if (presentCache.targetMarkdown.length) {
+						if (presentCache.targetMarkdown) {
 							await view.displayDefaultContent();
 						}
 					}

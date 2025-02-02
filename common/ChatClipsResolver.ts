@@ -39,18 +39,21 @@ export class ChatClipsResolver {
 
 	async prepare() {
 		const { workspace } = this.app;
+		console.log(`${Constants.BASE_NAME}: preparing`);
+
 		// may be null before workspace.onLayoutReady()
 		const leaf = workspace.getMostRecentLeaf(workspace.rootSplit);
-		if (leaf?.view instanceof MarkdownView) {
-			const { view } = leaf;
-			if (view.getMode() === "preview") {
-				await this.resolveLeaf(leaf);
-				if (!this.cache.targetMarkdown.length) {
-					return;
-				}
-				console.log(`${Constants.BASE_NAME}: rerendering`);
-				leaf.view.previewMode.rerender(true);
-			}
+		if (!(leaf?.view instanceof MarkdownView)) {
+			return;
+		}
+		const { view } = leaf;
+		await this.resolveLeaf(leaf);
+		if (!this.cache.targetMarkdown) {
+			return;
+		}
+		console.log(`${Constants.BASE_NAME}: rerendering`);
+		if (view.getMode() === "preview") {
+			view.previewMode.rerender(true);
 		}
 	}
 
@@ -75,9 +78,10 @@ export class ChatClipsResolver {
 			new Notice("Chat Clips: No associated file found!");
 			return;
 		}
-		if (view.file === this.cache.file) {
-			return;
-		}
+		// resolveLeaf() called 2 times whenever a new tab opened
+		// if (view.file === this.cache.file) {
+		// 	return;
+		// }
 		await this.resolveMarkdown(view.file, view.editor.getValue());
 	}
 
@@ -85,8 +89,9 @@ export class ChatClipsResolver {
 		console.log(`${Constants.BASE_NAME}: resolving ${file.path}`);
 		const cache = {
 			file: file,
-			targetMarkdown: this.doResolveMarkdown(sourceMarkdown).trimEnd(),
+			targetMarkdown: this.doResolveMarkdown(sourceMarkdown),
 		};
+		// console.log(cache.targetMarkdown);
 		await this.iterateTasks(cache);
 	}
 
@@ -105,30 +110,57 @@ export class ChatClipsResolver {
 	/**
 	 * todo recognize by codemirror
 	 */
-	doResolveMarkdown(content: string): string {
+	doResolveMarkdown(markdown: string): string {
+		// Don't match blank lines after that to count prevBlankLines correctly.
 		const pattern = new RegExp(
-			`^\\d+\\. +<span\\b[^>]*\\bclass="${Constants.CHAT_CLIPS_MARKUP_CLS}"[^>]*>.*\\s*^`,
-			"m"
+			`^\\d+\\. +<span\\s+[^>]*\\bclass\\s*=\\s*["'][^"']*\\b${Constants.CHAT_CLIPS_MARKUP_CLS}\\b[^"']*["'].*?>.*?<\\/span>.*?$`,
+			"sim"
 		);
-		const contentMatch = pattern.exec(content);
+		const contentMatch = pattern.exec(markdown);
 		if (!contentMatch) {
 			return "";
 		}
 
 		let output = "";
 		const startPos = contentMatch.index + contentMatch[0].length;
-		const lineRegex = /^([\t ]*)(([-+*]|((\d+)\.)) (.+))?$\s*^/gm;
+		const lineRegex = /^([\t ]*)(([-+*]|((\d+)\.)) )?(.*)$[\r\n]/gm;
 		lineRegex.lastIndex = startPos;
-		for (let lineMatch; (lineMatch = lineRegex.exec(content)) !== null; ) {
-			const [line, indents, item, marker, , markerNum, itemContent] =
-				lineMatch;
+		for (
+			let lineMatch, prevBlankLines = 0;
+			(lineMatch = lineRegex.exec(markdown)) !== null;
+
+		) {
+			const [line, indents, , marker, , markerNum, content] = lineMatch;
 			if (!marker) {
-				break;
+				if (
+					content &&
+					prevBlankLines &&
+					!(
+						indents.startsWith("\t") ||
+						indents.startsWith(" ".repeat(3))
+					)
+				) {
+					break;
+				}
+			}
+			if (!marker && !content) {
+				prevBlankLines++;
+				continue;
 			}
 
 			const indentsMatch = indents.match(/\t|( {1,4})/g);
 			const indentlevel = (indentsMatch?.length ?? 0) + 1;
 			const prefix = this.generateQuotePrefix(indentlevel);
+			if (prevBlankLines) {
+				output += `${prefix}\n`;
+			}
+			prevBlankLines = 0;
+
+			if (!marker) {
+				output += `${prefix}${content}\n`;
+				continue;
+			}
+
 			output += `${this.generateQuotePrefix(indentlevel - 1)}\n`;
 			if (markerNum) {
 				output += `${prefix}[!${Constants.DATA_CALLOUT_COMMENTS}|${Constants.DATA_CALLOUT_METADATA_PAGE}]+ ${markerNum}`;
@@ -137,12 +169,12 @@ export class ChatClipsResolver {
 					indentlevel <= 2
 						? Constants.DATA_CALLOUT_COMMENT
 						: Constants.DATA_CALLOUT_REPLY;
-				output += `${prefix}[!${calloutType}]\n${prefix}${itemContent}`;
+				output += `${prefix}[!${calloutType}]\n${prefix}${content}`;
 			}
 			output += "\n";
 		}
 
-		return output;
+		return output.trimEnd();
 	}
 
 	generateQuotePrefix = (function (

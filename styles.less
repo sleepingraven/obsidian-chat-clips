@@ -52,10 +52,16 @@ body {
 		display: none;
 	}
 	/* remove top and bottom margins and add left margin */
-	& > .callout-content p {
-		margin-block-start: 0;
-		margin-block-end: 0;
-		margin-left: var(--chat-clips-gap-spacing);
+	& > .callout-content {
+		p {
+			margin-block-start: 0;
+			margin-block-end: 0;
+			margin-inline-start: var(--chat-clips-gap-spacing);
+			// margin-inline-end: var(--chat-clips-gap-spacing);
+		}
+		p:not(:first-child) {
+			margin-block-start: var(--chat-clips-gap-spacing);
+		}
 	}
 	& > .callout-title {
 		line-height: inherit;
