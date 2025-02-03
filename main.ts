@@ -26,6 +26,10 @@ import {
 import { ChatClipsSettingTab } from "ui/SampleSettingTab";
 import { Constants } from "common/Constants";
 import { ChatClipsResolver } from "common/ChatClipsResolver";
+import { EditorView, ViewUpdate } from "@codemirror/view";
+import { historyField } from "@codemirror/commands";
+import { ChangeSet } from "@codemirror/state";
+import { syntaxTree } from "@codemirror/language";
 
 /* (ref: https://forum.obsidian.md/t/is-there-a-pre-render-pre-processor-callback/72530) */
 
@@ -35,6 +39,7 @@ import { ChatClipsResolver } from "common/ChatClipsResolver";
  */
 export default class ChatClipsPlugin extends Plugin {
 	private settings: ChatClipsPluginSettings;
+	private readonly editorMap = new WeakMap<EditorView, Editor>();
 
 	async onload() {
 		const { workspace } = this.app;
@@ -83,6 +88,58 @@ export default class ChatClipsPlugin extends Plugin {
 					await resolver.resolveMarkdown.bind(resolver)
 				)
 			);
+
+			this.registerEvent(
+				workspace.on("editor-change", (editor, info) => {
+					console.log(editor);
+					console.log(info);
+
+					// @ts-expect-error, not typed
+					const editorView = editor.cm as EditorView;
+				})
+			);
+			this.registerEditorExtension([
+				EditorView.updateListener.of((update: ViewUpdate) => {
+					if (!update.docChanged) {
+						return;
+					}
+					if (
+						!update.transactions.some((tr) => {
+							return [
+								"input",
+								"delete",
+								"move",
+								"select",
+								"undo",
+								"redo",
+							].some((e) => tr.isUserEvent(e));
+						})
+					) {
+						return;
+					}
+
+					const editorView = update.view;
+					console.log(editorView);
+
+					new Notice("Chat Clips: View creating failed!");
+
+					// 现在，你可以使用 editorView 与编辑器交互
+					// 获取当前文档内容
+					const content = editorView.state.doc.toString();
+
+					// 当前文档
+					const doc = update.state.doc;
+					// 之前的文档
+					const prevDoc = update.startState.doc;
+
+					update.changes.iterChanges(
+						(fromA, toA, fromB, toB, inserted) => {
+							const removedText = prevDoc.sliceString(fromA, toA);
+							const insertedText = inserted.toString();
+						}
+					);
+				}),
+			]);
 
 			await workspace.ensureSideLeaf(
 				CHAT_CLIPS_RIGHT_SIDEBAR_VIEW_TYPE,
