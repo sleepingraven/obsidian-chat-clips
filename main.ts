@@ -45,7 +45,7 @@ export default class ChatClipsPlugin extends Plugin {
 			(leaf) => new ChatClipsRightSidebarView(leaf)
 		);
 
-		const resolver = new ChatClipsResolver(this.app);
+		const resolver = new ChatClipsResolver(this);
 		workspace.onLayoutReady(async () => {
 			resolver.tasks.contentResolved.push((cache, presentCache) =>
 				this.applyToView(async (view) => {
@@ -91,46 +91,7 @@ export default class ChatClipsPlugin extends Plugin {
 			);
 		});
 
-		this.registerMarkdownPostProcessor(async (element, context) => {
-			const ccOls = element.findAll(
-				`ol:has( > li:first-child span.${Constants.CHAT_CLIPS_MARKUP_CLS})`
-			);
-			let elsToRender: HTMLElement[];
-			if (ccOls.length) {
-				elsToRender = ccOls
-					.map((ol) => ol.parentElement)
-					.filter((parentElement) => parentElement !== null)
-					.map((parentElement) => {
-						parentElement.empty();
-						parentElement.removeClass(Constants.EL_OL_CLS);
-						parentElement.addClasses([Constants.EL_DIV_CLS]);
-						return parentElement.createDiv({
-							cls: [Constants.CHAT_CLIPS_CONTAINER_CLS],
-						});
-					});
-			} else {
-				const ccDivs = element.findAll(
-					`.${Constants.CHAT_CLIPS_CONTAINER_CLS}`
-				);
-				if (ccDivs.length) {
-					elsToRender = ccDivs;
-				} else {
-					return;
-				}
-			}
-			console.log(
-				`${Constants.BASE_NAME}: rendering ${context.sourcePath}`
-			);
-			for (const el of elsToRender) {
-				await MarkdownRenderer.render(
-					this.app,
-					resolver.getTargetMarkdown(),
-					el,
-					context.sourcePath,
-					this
-				);
-			}
-		});
+		this.registerMarkdownPostProcessor(resolver.postProcessor());
 
 		// this.addSettingTab(new ChatClipsSettingTab(this.app, this));
 	}

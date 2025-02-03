@@ -3,8 +3,11 @@ import {
 	Editor,
 	MarkdownView,
 	Notice,
+	Plugin,
 	WorkspaceLeaf,
 	TFile,
+	MarkdownPostProcessor,
+	MarkdownRenderer,
 } from "obsidian";
 import { Constants } from "common/Constants";
 
@@ -21,12 +24,12 @@ type Tasks = {
 };
 
 export class ChatClipsResolver {
-	private readonly app: App;
+	private readonly plugin: Plugin;
 	private cache: ResolveCache;
 	readonly tasks: Tasks;
 
-	constructor(app: App) {
-		this.app = app;
+	constructor(plugin: Plugin) {
+		this.plugin = plugin;
 		this.cache = { file: undefined, targetMarkdown: "" };
 		this.tasks = {
 			contentResolved: [],
@@ -38,7 +41,7 @@ export class ChatClipsResolver {
 	}
 
 	async prepare() {
-		const { workspace } = this.app;
+		const { workspace } = this.plugin.app;
 		console.log(`${Constants.BASE_NAME}: preparing`);
 
 		// may be null before workspace.onLayoutReady()
@@ -63,7 +66,7 @@ export class ChatClipsResolver {
 		}
 		const { view } = leaf;
 		if (!(view instanceof MarkdownView)) {
-			const { workspace } = this.app;
+			const { workspace } = this.plugin.app;
 			if (leaf === workspace.getMostRecentLeaf(workspace.rootSplit)) {
 				const cache = {
 					file: null,
@@ -175,6 +178,49 @@ export class ChatClipsResolver {
 		}
 
 		return output.trimEnd();
+	}
+
+	postProcessor(): MarkdownPostProcessor {
+		return async (element, context) => {
+			const ccOls = element.findAll(
+				`ol:has( > li:first-child span.${Constants.CHAT_CLIPS_MARKUP_CLS})`
+			);
+			let elsToRender: HTMLElement[];
+			if (ccOls.length) {
+				elsToRender = ccOls
+					.map((ol) => ol.parentElement)
+					.filter((parentElement) => parentElement !== null)
+					.map((parentElement) => {
+						parentElement.empty();
+						parentElement.removeClass(Constants.EL_OL_CLS);
+						parentElement.addClasses([Constants.EL_DIV_CLS]);
+						return parentElement.createDiv({
+							cls: [Constants.CHAT_CLIPS_CONTAINER_CLS],
+						});
+					});
+			} else {
+				const ccDivs = element.findAll(
+					`.${Constants.CHAT_CLIPS_CONTAINER_CLS}`
+				);
+				if (ccDivs.length) {
+					elsToRender = ccDivs;
+				} else {
+					return;
+				}
+			}
+			console.log(
+				`${Constants.BASE_NAME}: rendering ${context.sourcePath}`
+			);
+			for (const el of elsToRender) {
+				await MarkdownRenderer.render(
+					this.plugin.app,
+					this.getTargetMarkdown(),
+					el,
+					context.sourcePath,
+					this.plugin
+				);
+			}
+		};
 	}
 
 	generateQuotePrefix = (function (
