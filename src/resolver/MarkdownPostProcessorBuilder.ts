@@ -53,6 +53,7 @@ export class MarkdownPostProcessorBuilder {
 				return;
 			}
 
+			/*
 			const file = this.plugin.app.vault.getFileByPath(
 				context.sourcePath
 			);
@@ -62,7 +63,6 @@ export class MarkdownPostProcessorBuilder {
 				);
 				return;
 			}
-			/*
 			const cache = await this.resolver.resolveMarkdown(
 				file,
 				sectionInfo.text,
@@ -84,7 +84,7 @@ export class MarkdownPostProcessorBuilder {
 			const elsToRender: HTMLElement[] = ccOls
 				.map((ol) => ol.parentElement)
 				.filter((parentElement) => parentElement !== null)
-				.map((parentElement) => {
+				.map((parentElement: HTMLElement) => {
 					parentElement.empty();
 					parentElement.removeClass(Constants.EL_OL_CLS);
 					parentElement.addClasses([Constants.EL_DIV_CLS]);

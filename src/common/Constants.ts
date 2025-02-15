@@ -11,7 +11,7 @@ export enum Constants {
 	ABBREVIATION = "chatclips",
 	BASE_DISPLAY_TEXT_CAP = "Chat clips",
 	BASE_DISPLAY_TEXT = "chat clips",
-	CHAT_CLIPS_MARKUP_CLS = `${BASE_NAME}-start`,
+	CHAT_CLIPS_MARKUP_CLS = `chat-clips-start`,
 
 	DATA_CALLOUT_COMMENTS = "comments",
 	DATA_CALLOUT_COMMENT = "comment",
@@ -20,7 +20,7 @@ export enum Constants {
 
 	EL_DIV_CLS = "el-div",
 	EL_OL_CLS = "el-ol",
-	CHAT_CLIPS_CONTAINER_CLS = `${BASE_NAME}-div`,
+	CHAT_CLIPS_CONTAINER_CLS = `chat-clips-div`,
 	PANE_EMPTY_CLS_FOR_RIGHT_SIDEBAR = "pane-empty",
 	TAG_CLS = "tag",
 }

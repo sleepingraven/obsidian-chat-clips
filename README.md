@@ -17,14 +17,14 @@ Editing view:
 ``` markdown
 1. #chatclips
 2. p 1
-	- What's the weather today?
-		- Today's weather is sunny with a high temperature of 9°C and a low temperature of -2°C. The wind is from the northwest at level 3, and the relative humidity is 22%. The UV index is strong, and the air quality is moderate with an AQI of 54.
-			- Thank you!
+    - What's the weather today?
+        - Today's weather is sunny with a high temperature of 9°C and a low temperature of -2°C. The wind is from the northwest at level 3, and the relative humidity is 22%. The UV index is strong, and the air quality is moderate with an AQI of 54.
+            - Thank you!
 ```
 
 Reading view:
 
-[Reading view example](assets/reading-view-example.png)
+![Reading view example](assets/reading-view-example.png)
 
 ## Usage
 
@@ -35,12 +35,12 @@ A chat clips list is defined by:
 1. an ordered list at first level.
    - first list item is to indicate chat clips.
    - other list items are recognized as [chat clips commands](#chat-clips-commands).
-2. chat contents are start at the second level.
+2. chat contents that start at the second level.
 
 ### Chat clips commands
 
 | Name | Description                 | Pattern           |
 | ---- | --------------------------- | ----------------- |
-| Page | Group sublists into a page. | p \<page-number\> |
+| Page | Group sublists into a page. | `p <page-number>` |
 
 ## installation
