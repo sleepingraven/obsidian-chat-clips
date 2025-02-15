@@ -3,7 +3,7 @@
  * @Date         2025-02-14 18:55:29
  * @LastEditors  sleepingraven
  * @LastEditTime 2025-02-14 19:18:44
- * @FilePath     \obsidian-chat-clips\src\resolver\MarkdownPostProcessorBuilder.ts
+ * @FilePath     \chat-clips\src\resolver\MarkdownPostProcessorBuilder.ts
  * @Description  这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import {
