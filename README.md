@@ -12,7 +12,7 @@ This plugin allows record chat in markdown list in *editing view*, and display c
 
 ## Example
 
-Editing view:
+### Editing view
 
 ``` markdown
 1. #chatclips
@@ -22,20 +22,20 @@ Editing view:
             - Thank you!
 ```
 
-Reading view:
+### Reading view
 
 ![Reading view example](assets/reading-view-example.png)
 
 ## Usage
 
-### Define a chat clips list
+### Define a Chat clips list
 
-A chat clips list is defined by:
+A Chat clips list is defined by:
 
-1. an ordered list at first level.
-   - first list item is to indicate chat clips.
-   - other list items are recognized as [chat clips commands](#chat-clips-commands).
-2. chat contents that start at the second level.
+1. An ordered list at first level.
+   - First list item is to indicate Chat clips.
+   - Followed list items are recognized as [Chat clips commands](#chat-clips-commands).
+2. Chat contents that start at the second level.
 
 ### Chat clips commands
 
@@ -44,3 +44,10 @@ A chat clips list is defined by:
 | Page | Group sublists into a page. | `p <page-number>` |
 
 ## installation
+
+### [Install from community plugins](https://help.obsidian.md/Extending+Obsidian/Community+plugins#Install+a+community+plugin)
+
+### Install manually
+
+1. Open [latest release](https://github.com/sleepingraven/obsidian-chat-clips/releases/latest).
+2. Download `main.js`, `manifest.json` and `styles.css` to `<obsidian-vault>/.obsidian/plugins/chat-clips`.
