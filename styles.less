@@ -13,6 +13,7 @@ If your plugin does not need CSS, delete this file.
 @data-callout-comment: comment;
 @data-callout-reply: reply;
 @data-callout-metadata-page: page;
+@data-type-chat-clips-right-sidebar-view: chat-clips-right-sidebar-view;
 
 body {
 	--chat-clips-gap-spacing: var(--size-4-2);
@@ -46,7 +47,7 @@ body {
 	display: flex;
 	align-items: flex-start;
 	padding: var(--chat-clips-gap-spacing);
-	width: fit-content;
+	// width: fit-content;
 	/* hide title */
 	.callout-title-inner {
 		display: none;
@@ -54,10 +55,8 @@ body {
 	/* remove top and bottom margins and add left margin */
 	& > .callout-content {
 		p {
-			margin-block-start: 0;
-			margin-block-end: 0;
-			margin-inline-start: var(--chat-clips-gap-spacing);
-			// margin-inline-end: var(--chat-clips-gap-spacing);
+			margin-block: 0;
+			margin-inline: var(--chat-clips-gap-spacing);
 		}
 		p:not(:first-child) {
 			margin-block-start: var(--chat-clips-gap-spacing);
@@ -78,4 +77,8 @@ body {
 	& > .callout-title > .callout-title-inner:before {
 		content: "p. ";
 	}
+}
+
+[data-type="@{data-type-chat-clips-right-sidebar-view}"] .chat-clips-div {
+	user-select: text;
 }

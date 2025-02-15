@@ -1,11 +1,10 @@
 {
 	"id": "chat-clips",
-	"name": "Chat Clips",
-	"version": "0.2.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"name": "Chat clips",
+	"version": "0.3.0",
+	"minAppVersion": "1.8.4",
+	"description": "Record chat in ordinary markdown list.",
+	"author": "sleepingraven",
+	"authorUrl": "https://github.com/sleepingraven",
 	"isDesktopOnly": false
 }
