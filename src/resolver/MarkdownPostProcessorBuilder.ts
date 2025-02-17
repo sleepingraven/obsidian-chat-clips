@@ -36,17 +36,20 @@ export class MarkdownPostProcessorBuilder {
 			}
 
 			let ccOls: HTMLElement[];
-			let tagged = false;
+			const findTagged = () =>
+				element.findAll(
+					`ol:has( > li:first-child .${Constants.TAG_CLS}[href='#${Constants.ABBREVIATION}'])`
+				);
+			let tagged: boolean;
 			switch (this.plugin.settings.locator) {
 				case "class":
 					ccOls = element.findAll(
 						`ol:has( > li:first-child span.${Constants.CHAT_CLIPS_MARKUP_CLS})`
 					);
+					tagged = findTagged().length > 0;
 					break;
 				default:
-					ccOls = element.findAll(
-						`ol:has( > li:first-child .${Constants.TAG_CLS}[href='#${Constants.ABBREVIATION}'])`
-					);
+					ccOls = findTagged();
 					tagged = true;
 			}
 			if (!ccOls.length) {
@@ -77,6 +80,9 @@ export class MarkdownPostProcessorBuilder {
 				sectionInfo.text,
 				startIndex
 			);
+			if (ENV_VAR.printParsedMarkdown) {
+				console.log(targetMarkdown);
+			}
 			if (!targetMarkdown) {
 				return;
 			}

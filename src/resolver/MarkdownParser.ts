@@ -27,7 +27,7 @@ export class MarkdownParser {
 		lineRegex.lastIndex =
 			startMatch.index + startMatch[0].length + startIndex;
 		for (
-			let lineMatch, prevBlankLines = 0;
+			let lineMatch, prevBlankLines = 0, contentItemLevel = 0;
 			(lineMatch = lineRegex.exec(markdown)) !== null;
 
 		) {
@@ -58,7 +58,15 @@ export class MarkdownParser {
 			prevBlankLines = 0;
 
 			if (!marker) {
-				output += `${prefix0}${content}\n`;
+				const prefixI =
+					MarkdownParser.generateQuotePrefix(contentItemLevel);
+				const prefixC =
+					indentlevel0 > contentItemLevel
+						? MarkdownParser.generateIndents(
+								indentlevel0 - contentItemLevel
+						  )
+						: "";
+				output += `${prefixI}${prefixC}${content}\n`;
 				continue;
 			}
 
@@ -90,6 +98,7 @@ export class MarkdownParser {
 
 				output += `${prefix0}${item}\n`;
 			} else {
+				contentItemLevel = indentlevel1;
 				const calloutType =
 					indentlevel1 <= 2
 						? Constants.DATA_CALLOUT_COMMENT
@@ -120,9 +129,10 @@ export class MarkdownParser {
 		return pattern.exec(markdown.substring(startIndex));
 	}
 
-	static generateQuotePrefix = (function (
-		toRepeat: string
-	): (occurrence: number) => string {
+	static generateIndents = MarkdownParser.quickRepeat("\t");
+	static generateQuotePrefix = MarkdownParser.quickRepeat(">");
+
+	static quickRepeat(toRepeat: string): (occurrence: number) => string {
 		const quotePrefix: Array<string> = ["", toRepeat];
 		return (occurrence: number) => {
 			return (
@@ -130,5 +140,5 @@ export class MarkdownParser {
 				(quotePrefix[occurrence] = quotePrefix[1].repeat(occurrence))
 			);
 		};
-	})(">");
+	}
 }

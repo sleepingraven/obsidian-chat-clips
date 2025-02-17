@@ -1,7 +1,7 @@
 {
 	"id": "chat-clips",
 	"name": "Chat clips",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"minAppVersion": "1.8.4",
 	"description": "Record chat in ordinary markdown list.",
 	"author": "sleepingraven",

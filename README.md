@@ -43,6 +43,11 @@ A Chat clips list is defined by:
 | ---- | --------------------------- | ----------------- |
 | Page | Group sublists into a page. | `p <page-number>` |
 
+## Limitation
+
+1. Chat contents can not contain unordered list.
+2. Chat contents can not apply indents.
+
 ## installation
 
 ### [Install from community plugins](https://help.obsidian.md/Extending+Obsidian/Community+plugins#Install+a+community+plugin)
