@@ -6,18 +6,19 @@
  * @FilePath     \chat-clips\src\ui\SettingTab.ts
  * @Description  这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, PluginSettingTab, Setting } from "obsidian";
+import { Dictionary } from "ts-essentials";
 import ChatClipsPlugin from "main";
 import { Constants } from "src/common/Constants";
 import { ChatClipsResolver } from "src/resolver/ChatClipsResolver";
 
-type locatorRecordKeys = keyof typeof locatorRecord;
-const locatorRecord = {
+type LocatorRecordKey = keyof typeof locatorRecord;
+const locatorRecord: Readonly<Dictionary<string>> = {
 	tag: `tag: #${Constants.ABBREVIATION}`,
 	class: `css class: span.${Constants.CHAT_CLIPS_MARKUP_CLS}`,
-} as const;
+};
 export interface ChatClipsPluginSettings {
-	locator: locatorRecordKeys;
+	locator: LocatorRecordKey;
 }
 
 export const CHAT_CLIPS_DEFAULT_SETTINGS: ChatClipsPluginSettings = {
@@ -57,7 +58,7 @@ export class SettingTab extends PluginSettingTab {
 						}
 
 						this.plugin.settings.locator =
-							value as locatorRecordKeys;
+							value as LocatorRecordKey;
 						await this.resolver.clearCache();
 						await this.plugin.saveSettings();
 					});

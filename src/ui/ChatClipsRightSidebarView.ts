@@ -11,10 +11,10 @@ import {
 	WorkspaceLeaf,
 	MarkdownRenderer,
 	Workspace,
-	Plugin,
 	TFile,
+	View,
 } from "obsidian";
-import { Constants, Optional } from "src/common/Constants";
+import { Constants, Nullable } from "src/common/Constants";
 import { ChatClipsResolver } from "src/resolver/ChatClipsResolver";
 import { LeafUtil } from "src/common/LeafUtil";
 
@@ -64,7 +64,7 @@ export class ChatClipsRightSidebarView extends ItemView {
 
 	static async refreshViewIfFileIsActive(
 		view: ChatClipsRightSidebarView,
-		file: Optional<TFile>
+		file: Nullable<TFile>
 	) {
 		if (file !== view.app.workspace.getActiveFile()) {
 			return;
@@ -79,7 +79,7 @@ export class ChatClipsRightSidebarView extends ItemView {
 
 	static async doRefreshView(
 		view: ChatClipsRightSidebarView,
-		file: Optional<TFile>
+		file: Nullable<TFile>
 	): Promise<void> {
 		if (!file) {
 			view.displayDefaultContent();
@@ -139,11 +139,19 @@ export class ChatClipsRightSidebarView extends ItemView {
 		await Promise.allSettled(
 			workspace
 				.getLeavesOfType(CHAT_CLIPS_RIGHT_SIDEBAR_VIEW_TYPE)
-				.map(async (leaf) => {
-					if (leaf?.view instanceof ChatClipsRightSidebarView) {
-						await callback(leaf.view);
-					}
-				})
+				.map((leaf) => leaf.view)
+				.filter((view): view is ChatClipsRightSidebarView =>
+					ChatClipsRightSidebarView.requireChatClipsRightSidebarView(
+						view
+					)
+				)
+				.map(async (view) => await callback(view))
 		);
+	}
+
+	static requireChatClipsRightSidebarView(
+		view: View
+	): view is ChatClipsRightSidebarView {
+		return view instanceof ChatClipsRightSidebarView;
 	}
 }

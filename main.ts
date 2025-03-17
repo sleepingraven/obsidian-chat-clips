@@ -6,7 +6,7 @@
  * @FilePath     \chat-clips\main.ts
  * @Description  这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import { App, Plugin } from "obsidian";
+import { Plugin } from "obsidian";
 import {
 	ChatClipsRightSidebarView,
 	CHAT_CLIPS_RIGHT_SIDEBAR_VIEW_TYPE,
@@ -20,11 +20,12 @@ import { ChatClipsResolver } from "src/resolver/ChatClipsResolver";
 import { MarkdownPostProcessorBuilder } from "src/resolver/MarkdownPostProcessorBuilder";
 import { Constants } from "src/common/Constants";
 
-/**
- *
- */
 export default class ChatClipsPlugin extends Plugin {
-	settings: ChatClipsPluginSettings;
+	private _settings: ChatClipsPluginSettings;
+
+	get settings() {
+		return this._settings;
+	}
 
 	async onload() {
 		const { workspace } = this.app;
@@ -86,7 +87,7 @@ export default class ChatClipsPlugin extends Plugin {
 	onunload() {}
 
 	async loadSettings() {
-		this.settings = Object.assign(
+		this._settings = Object.assign(
 			{},
 			CHAT_CLIPS_DEFAULT_SETTINGS,
 			await this.loadData()

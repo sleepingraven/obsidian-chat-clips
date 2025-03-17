@@ -6,23 +6,15 @@
  * @FilePath     \chat-clips\src\resolver\ChatClipsResolver.ts
  * @Description  这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import {
-	App,
-	Editor,
-	MarkdownView,
-	Notice,
-	Plugin,
-	TFile,
-	WorkspaceLeaf,
-} from "obsidian";
-import { Constants, ENV_VAR, Optional } from "src/common/Constants";
+import { MarkdownView, Notice, TFile, WorkspaceLeaf } from "obsidian";
+import { Constants, ENV_VAR, Nullable } from "src/common/Constants";
 import ChatClipsPlugin from "main";
 import { LeafUtil } from "src/common/LeafUtil";
 import { MarkdownParser } from "src/resolver/MarkdownParser";
 
 type TaskKeys = "afterResolve";
 type Tasks = {
-	[key in TaskKeys]: ((file: Optional<TFile>) => Promise<void>)[];
+	[key in TaskKeys]: ((file: Nullable<TFile>) => Promise<void>)[];
 };
 
 class parsedCache {
@@ -183,7 +175,7 @@ export class ChatClipsResolver {
 		return parsePromise;
 	}
 
-	async iterateTasks(file: Optional<TFile>) {
+	async iterateTasks(file: Nullable<TFile>) {
 		await Promise.allSettled(
 			this._tasks.afterResolve.map(async (f) => await f(file))
 		);

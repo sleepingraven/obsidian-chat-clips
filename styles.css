@@ -38,9 +38,9 @@ body {
   /* remove top and bottom margins and add left margin */
   /* v-align icon in center of first line */
 }
-.callout[data-callout="comment"] .callout-title-inner,
-.callout[data-callout="reply"] .callout-title-inner,
-.callout[data-callout-metadata*="badge"] .callout-title-inner {
+.callout[data-callout="comment"] > .callout-title > .callout-title-inner,
+.callout[data-callout="reply"] > .callout-title > .callout-title-inner,
+.callout[data-callout-metadata*="badge"] > .callout-title > .callout-title-inner {
   display: none;
 }
 .callout[data-callout="comment"] > .callout-content p,
