@@ -23,16 +23,29 @@ export class MarkdownParser {
 		}
 
 		let output = "";
-		const lineRegex = /^([\t ]*)((([-+*]|((\d+)\.)) )?(.*))$[\r\n]/gm;
+		// [\r\n]: avoid infinite loop at empty line
+		const lineRegex = /^([\t ]*)((([-+*]|((\d+)\.)) )?(.*))$([\r\n]?)/gm;
 		lineRegex.lastIndex =
 			startMatch.index + startMatch[0].length + startIndex;
 		for (
-			let lineMatch, prevBlankLines = 0, contentItemLevel = 0;
-			(lineMatch = lineRegex.exec(markdown)) !== null;
+			let lineMatch, prevBlankLines = 0, contentItemLevel = 0, lb = true;
+			lb && (lineMatch = lineRegex.exec(markdown)) !== null;
 
 		) {
-			const [_line, indents, item, , marker, , markerNum, content] =
-				lineMatch;
+			const [
+				_line,
+				indents,
+				item,
+				,
+				marker,
+				,
+				markerNum,
+				content,
+				lineBreak,
+			] = lineMatch;
+			// handle empty line at EOF
+			lb = !!lineBreak.length;
+
 			const hasIndent = () =>
 				indents.startsWith("\t") || indents.startsWith(" ".repeat(3));
 			if (!marker) {
@@ -76,23 +89,40 @@ export class MarkdownParser {
 
 			if (markerNum?.length) {
 				if (indentlevel0 === 0) {
-					let page;
-					const commands = content.trim().split(/[ \t]/);
-					for (let i = 0; i < commands.length; i++) {
-						const j = i + 1;
-						switch (commands[i]) {
-							case "p":
-								if (j < commands.length) {
-									page = commands[j];
-									i = j;
-								}
-								break;
-							default:
+					let title: (() => string) | undefined;
+					if (content.startsWith('"') && content.endsWith('"')) {
+						title = () =>
+							`${prefix1}[!${
+								Constants.DATA_CALLOUT_COMMENTS
+							}]+ ${content.substring(1, content.length - 1)}\n`;
+					} else {
+						const commands = content.trim().split(/[ \t]/);
+						for (
+							let i = 0, page: string;
+							i < commands.length;
+							i++
+						) {
+							switch (commands[i]) {
+								case "p":
+									page =
+										++i < commands.length
+											? commands[i]
+											: "?";
+									title = () =>
+										`${prefix1}[!${Constants.DATA_CALLOUT_COMMENTS}|${Constants.DATA_CALLOUT_METADATA_PAGE}]+ ${page}\n`;
+									break;
+								default:
+									title = () =>
+										`${prefix1}[!${Constants.DATA_CALLOUT_COMMENTS}]+ ${content}\n`;
+									i = commands.length;
+									break;
+							}
 						}
 					}
-					output += `${prefix1}[!${Constants.DATA_CALLOUT_COMMENTS}|${
-						Constants.DATA_CALLOUT_METADATA_PAGE
-					}]+ ${page ?? "?"}\n`;
+
+					if (title !== undefined) {
+						output += title();
+					}
 					continue;
 				}
 

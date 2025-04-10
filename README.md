@@ -39,9 +39,10 @@ A Chat clips list is defined by:
 
 ### Chat clips commands
 
-| Name | Description                 | Pattern           |
-| ---- | --------------------------- | ----------------- |
-| Page | Group sublists into a page. | `p <page-number>` |
+| Name   | Description                 | Pattern                              |
+| ------ | --------------------------- | ------------------------------------ |
+| Group  | Fold sublists into a group. | `<group-title>` \| `"<group-title>"` |
+| Page   | Fold sublists into a page.  | `p <page-title>`                     |
 
 ## Limitation
 
