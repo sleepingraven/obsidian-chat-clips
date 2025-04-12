@@ -9,27 +9,34 @@ If your plugin does not need CSS, delete this file.
 body {
   --chat-clips-gap-spacing: var(--size-4-2);
 }
-/* callouts */
-.callout[data-callout="comments"] {
+/* callout title */
+.callout[data-callout^="chat-clips-folder"] {
   background-color: transparent;
+}
+.callout[data-callout^="chat-clips-comment"] {
+  --callout-color: var(--callout-quote);
+}
+.callout[data-callout^="chat-clips-folder"] {
   --callout-icon: messages-square;
-  padding: 0;
 }
-.callout[data-callout="comments"] > .callout-title {
-  padding-left: var(--chat-clips-gap-spacing);
-}
-.callout[data-callout="comment"] {
-  --callout-color: var(--callout-quote);
-  --callout-icon: message-circle;
-}
-.callout[data-callout="reply"] {
-  --callout-color: var(--callout-quote);
+.callout[data-callout^="chat-clips-comment"] {
   --callout-icon: reply;
 }
-/* title adjustment (ref: https://forum.obsidian.md/t/callouts-without-title/50547) */
-.callout[data-callout="comment"],
-.callout[data-callout="reply"],
-.callout[data-callout-metadata*="badge"] {
+.callout[data-callout="chat-clips-comment-1"] {
+  --callout-icon: message-circle;
+}
+.callout[data-callout^="chat-clips-folder"] {
+  padding: 0;
+}
+.callout[data-callout^="chat-clips-folder"] > .callout-title {
+  padding-left: var(--chat-clips-gap-spacing);
+}
+.callout[data-callout="chat-clips-folder-page"] > .callout-title > .callout-title-inner:before {
+  content: "p. ";
+}
+/* title adjustment for comments (ref: https://forum.obsidian.md/t/callouts-without-title/50547) */
+.callout[data-callout^="chat-clips-comment"],
+.callout[data-callout-metadata="chat-clips-badge"] {
   /* align icon and content side-by-side */
   display: flex;
   align-items: flex-start;
@@ -38,40 +45,32 @@ body {
   /* remove top and bottom margins and add left margin */
   /* v-align icon in center of first line */
 }
-.callout[data-callout="comment"] > .callout-title > .callout-title-inner,
-.callout[data-callout="reply"] > .callout-title > .callout-title-inner,
-.callout[data-callout-metadata*="badge"] > .callout-title > .callout-title-inner {
+.callout[data-callout^="chat-clips-comment"] > .callout-title > .callout-title-inner,
+.callout[data-callout-metadata="chat-clips-badge"] > .callout-title > .callout-title-inner {
   display: none;
 }
-.callout[data-callout="comment"] > .callout-content p,
-.callout[data-callout="reply"] > .callout-content p,
-.callout[data-callout-metadata*="badge"] > .callout-content p {
+.callout[data-callout^="chat-clips-comment"] > .callout-content p,
+.callout[data-callout-metadata="chat-clips-badge"] > .callout-content p {
   margin-block: 0;
   margin-inline: var(--chat-clips-gap-spacing);
 }
-.callout[data-callout="comment"] > .callout-content p:not(:first-child),
-.callout[data-callout="reply"] > .callout-content p:not(:first-child),
-.callout[data-callout-metadata*="badge"] > .callout-content p:not(:first-child) {
+.callout[data-callout^="chat-clips-comment"] > .callout-content p:not(:first-child),
+.callout[data-callout-metadata="chat-clips-badge"] > .callout-content p:not(:first-child) {
   margin-block-start: var(--chat-clips-gap-spacing);
 }
-.callout[data-callout="comment"] > .callout-title,
-.callout[data-callout="reply"] > .callout-title,
-.callout[data-callout-metadata*="badge"] > .callout-title {
+.callout[data-callout^="chat-clips-comment"] > .callout-title,
+.callout[data-callout-metadata="chat-clips-badge"] > .callout-title {
   line-height: inherit;
 }
-.callout[data-callout="comment"] > .callout-title,
-.callout[data-callout="reply"] > .callout-title,
-.callout[data-callout-metadata*="badge"] > .callout-title,
-.callout[data-callout="comment"] > .callout-icon,
-.callout[data-callout="reply"] > .callout-icon,
-.callout[data-callout-metadata*="badge"] > .callout-icon {
+.callout[data-callout^="chat-clips-comment"] > .callout-title,
+.callout[data-callout-metadata="chat-clips-badge"] > .callout-title,
+.callout[data-callout^="chat-clips-comment"] > .callout-icon,
+.callout[data-callout-metadata="chat-clips-badge"] > .callout-icon {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.callout[data-callout-metadata="page"] > .callout-title > .callout-title-inner:before {
-  content: "p. ";
-}
+/* other */
 [data-type="chat-clips-right-sidebar-view"] .chat-clips-div {
   user-select: text;
 }

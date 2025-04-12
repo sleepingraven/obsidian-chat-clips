@@ -43,7 +43,8 @@ export class SettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl)
+		const settingSupplier = () => new Setting(containerEl);
+		settingSupplier()
 			.setName("Locator")
 			.setDesc(
 				`Choose the markup expression that indicates a ${Constants.BASE_DISPLAY_TEXT} list.`

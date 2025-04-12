@@ -89,12 +89,14 @@ export class MarkdownParser {
 
 			if (markerNum?.length) {
 				if (indentlevel0 === 0) {
-					let title: (() => string) | undefined;
+					let titleSupplier: (() => string) | undefined;
 					if (content.startsWith('"') && content.endsWith('"')) {
-						title = () =>
-							`${prefix1}[!${
-								Constants.DATA_CALLOUT_COMMENTS
-							}]+ ${content.substring(1, content.length - 1)}\n`;
+						titleSupplier = () =>
+							`${prefix1}${calloutTypeMarkdown({
+								data_callout:
+									Constants.DATA_CALLOUT_FOLDER_GROUP,
+								data_callout_fold: "+",
+							})} ${content.substring(1, content.length - 1)}\n`;
 					} else {
 						const commands = content.trim().split(/[ \t]/);
 						for (
@@ -108,20 +110,28 @@ export class MarkdownParser {
 										++i < commands.length
 											? commands[i]
 											: "?";
-									title = () =>
-										`${prefix1}[!${Constants.DATA_CALLOUT_COMMENTS}|${Constants.DATA_CALLOUT_METADATA_PAGE}]+ ${page}\n`;
+									titleSupplier = () =>
+										`${prefix1}${calloutTypeMarkdown({
+											data_callout:
+												Constants.DATA_CALLOUT_FOLDER_PAGE,
+											data_callout_fold: "+",
+										})} ${page}\n`;
 									break;
 								default:
-									title = () =>
-										`${prefix1}[!${Constants.DATA_CALLOUT_COMMENTS}]+ ${content}\n`;
+									titleSupplier = () =>
+										`${prefix1}${calloutTypeMarkdown({
+											data_callout:
+												Constants.DATA_CALLOUT_FOLDER_GROUP,
+											data_callout_fold: "+",
+										})} ${content}\n`;
 									i = commands.length;
 									break;
 							}
 						}
 					}
 
-					if (title !== undefined) {
-						output += title();
+					if (titleSupplier) {
+						output += titleSupplier();
 					}
 					continue;
 				}
@@ -129,10 +139,7 @@ export class MarkdownParser {
 				output += `${prefix0}${item}\n`;
 			} else {
 				contentItemLevel = indentlevel1;
-				const calloutType =
-					indentlevel1 <= 2
-						? Constants.DATA_CALLOUT_COMMENT
-						: Constants.DATA_CALLOUT_REPLY;
+				const calloutType = `${Constants.DATA_CALLOUT_COMMENT}-${indentlevel0}`;
 				output += `${prefix1}[!${calloutType}]\n${prefix1}${content}\n`;
 			}
 		}
@@ -171,4 +178,21 @@ export class MarkdownParser {
 			);
 		};
 	}
+}
+
+type CalloutTypeParams = {
+	data_callout: string;
+	data_callout_metadata?: string;
+	data_callout_fold?: "+";
+};
+function calloutTypeMarkdown({
+	data_callout,
+	data_callout_metadata,
+	data_callout_fold,
+}: CalloutTypeParams) {
+	return `[!${
+		data_callout_metadata?.length
+			? data_callout + "|" + data_callout_metadata
+			: data_callout
+	}]${data_callout_fold ?? ""}`;
 }

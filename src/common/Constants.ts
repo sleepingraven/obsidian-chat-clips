@@ -7,17 +7,17 @@
  * @Description  这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 const BASE_NAME = "chat-clips";
+const ABBREVIATION = "chatclips";
 export const Constants = {
 	BASE_NAME: BASE_NAME,
-	ABBREVIATION: "chatclips",
+	ABBREVIATION: ABBREVIATION,
 	BASE_DISPLAY_TEXT_CAP: "Chat clips",
 	BASE_DISPLAY_TEXT: "chat clips",
 	CHAT_CLIPS_MARKUP_CLS: `${BASE_NAME}-start`,
 
-	DATA_CALLOUT_COMMENTS: "comments",
-	DATA_CALLOUT_COMMENT: "comment",
-	DATA_CALLOUT_REPLY: "reply",
-	DATA_CALLOUT_METADATA_PAGE: "page",
+	DATA_CALLOUT_FOLDER_GROUP: `${BASE_NAME}-folder-group`,
+	DATA_CALLOUT_FOLDER_PAGE: `${BASE_NAME}-folder-page`,
+	DATA_CALLOUT_COMMENT: `${BASE_NAME}-comment`,
 
 	EL_DIV_CLS: "el-div",
 	EL_OL_CLS: "el-ol",

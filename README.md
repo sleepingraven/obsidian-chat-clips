@@ -28,26 +28,60 @@ This plugin allows record chat in markdown list in *editing view*, and display c
 
 ## Usage
 
-### Define a Chat clips list
+### Define a chat clips list
 
-A Chat clips list is defined by:
+A *chat clips list* is defined by:
 
 1. An ordered list at first level.
-   - First list item is to indicate Chat clips.
-   - Followed list items are recognized as [Chat clips commands](#chat-clips-commands).
-2. Chat contents that start at the second level.
+   - First list item is to indicate chat clips.
+   - Followed list items are recognized as [*chat clips commands*](#chat-clips-commands).
+2. Unordered lists that start at the second level.
+   - Each unordered list item is rendered to a *chat clips comment* in reading view.
 
 ### Chat clips commands
 
 | Name   | Description                 | Pattern                              |
 | ------ | --------------------------- | ------------------------------------ |
 | Group  | Fold sublists into a group. | `<group-title>` \| `"<group-title>"` |
-| Page   | Fold sublists into a page.  | `p <page-title>`                     |
+| Page   | Fold sublists into a page.  | `p <page-number>`                    |
+
+### Customize appearance
+
+You can use [CSS snippets](https://help.obsidian.md/snippets) to customize the appearance.
+
+Example:
+
+``` css
+.callout[data-callout^="chat-clips-folder"] {
+  background-color: transparent;
+}
+.callout[data-callout^="chat-clips-comment"] {
+  --callout-color: var(--callout-quote);
+}
+```
+
+Applicable CSS selectors are as follows:
+
+``` css
+/* fuzzyly select */
+.callout[data-callout^="chat-clips-folder"],
+.callout[data-callout^="chat-clips-comment"] {
+}
+
+/* precisely select */
+.callout[data-callout="chat-clips-folder-group"],
+.callout[data-callout="chat-clips-folder-page"],
+.callout[data-callout="chat-clips-comment-1"],
+.callout[data-callout="chat-clips-comment-2"]/*,
+.callout[data-callout="chat-clips-comment-3"],
+…… */ {
+}
+```
 
 ## Limitation
 
-1. Chat contents can not contain unordered list.
-2. Chat contents can not apply indents.
+1. Chat clips comment can not contain unordered list.
+2. Chat clips comment can not apply indents.
 
 ## Installation
 

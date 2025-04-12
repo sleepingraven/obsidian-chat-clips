@@ -8,41 +8,55 @@ If your plugin does not need CSS, delete this file.
 */
 
 @base-name: chat-clips;
+@abbreviation: chatclips;
 
-@data-callout-comments: comments;
-@data-callout-comment: comment;
-@data-callout-reply: reply;
-@data-callout-metadata-page: page;
+@data-callout-folder-prefix: "@{base-name}-folder";
+@data-callout-folder-group: "@{data-callout-folder-prefix}-group";
+@data-callout-folder-page: "@{data-callout-folder-prefix}-page";
+@data-callout-comment-prefix: "@{base-name}-comment";
+
 @data-type-chat-clips-right-sidebar-view: chat-clips-right-sidebar-view;
+@chat-clips-div: ~"@{base-name}-div";
 
 body {
 	--chat-clips-gap-spacing: var(--size-4-2);
 }
 
-/* callouts */
+/* callout title */
 
-.callout[data-callout="@{data-callout-comments}"] {
+.callout[data-callout^="@{data-callout-folder-prefix}"] {
 	background-color: transparent;
+}
+.callout[data-callout^="@{data-callout-comment-prefix}"] {
+	--callout-color: var(--callout-quote);
+}
+
+.callout[data-callout^="@{data-callout-folder-prefix}"] {
 	--callout-icon: messages-square;
+}
+.callout[data-callout^="@{data-callout-comment-prefix}"] {
+	--callout-icon: reply;
+}
+.callout[data-callout="@{data-callout-comment-prefix}-1"] {
+	--callout-icon: message-circle;
+}
+
+.callout[data-callout^="@{data-callout-folder-prefix}"] {
 	padding: 0;
 	& > .callout-title {
 		padding-left: var(--chat-clips-gap-spacing);
 	}
 }
-.callout[data-callout="@{data-callout-comment}"] {
-	--callout-color: var(--callout-quote);
-	--callout-icon: message-circle;
-}
-.callout[data-callout="@{data-callout-reply}"] {
-	--callout-color: var(--callout-quote);
-	--callout-icon: reply;
+.callout[data-callout="@{data-callout-folder-page}"] {
+	& > .callout-title > .callout-title-inner:before {
+		content: "p. ";
+	}
 }
 
-/* title adjustment (ref: https://forum.obsidian.md/t/callouts-without-title/50547) */
+/* title adjustment for comments (ref: https://forum.obsidian.md/t/callouts-without-title/50547) */
 
-.callout[data-callout="@{data-callout-comment}"],
-.callout[data-callout="@{data-callout-reply}"],
-.callout[data-callout-metadata*="badge"] {
+.callout[data-callout^="@{data-callout-comment-prefix}"],
+.callout[data-callout-metadata="@{base-name}-badge"] {
 	/* align icon and content side-by-side */
 	display: flex;
 	align-items: flex-start;
@@ -73,12 +87,9 @@ body {
 		justify-content: center;
 	}
 }
-.callout[data-callout-metadata="@{data-callout-metadata-page}"] {
-	& > .callout-title > .callout-title-inner:before {
-		content: "p. ";
-	}
-}
 
-[data-type="@{data-type-chat-clips-right-sidebar-view}"] .chat-clips-div {
+/* other */
+
+[data-type="@{data-type-chat-clips-right-sidebar-view}"] .@{chat-clips-div} {
 	user-select: text;
 }
