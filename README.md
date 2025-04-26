@@ -81,7 +81,6 @@ Applicable CSS selectors are as follows:
 ## Limitation
 
 1. Chat clips comment can not contain unordered list.
-2. Chat clips comment can not apply indents.
 
 ## Installation
 

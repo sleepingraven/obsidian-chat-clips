@@ -22,13 +22,13 @@ export class MarkdownParser {
 			return "";
 		}
 
-		let output = "";
+		const output = new StringBuilder();
 		// [\r\n]: avoid infinite loop at empty line
 		const lineRegex = /^([\t ]*)((([-+*]|((\d+)\.)) )?(.*))$([\r\n]?)/gm;
 		lineRegex.lastIndex =
 			startMatch.index + startMatch[0].length + startIndex;
 		for (
-			let lineMatch, prevBlankLines = 0, contentItemLevel = 0, lb = true;
+			let lineMatch, prevBlankLines = 0, contentLevel = 1, lb = true;
 			lb && (lineMatch = lineRegex.exec(markdown)) !== null;
 
 		) {
@@ -63,88 +63,85 @@ export class MarkdownParser {
 			}
 
 			const indentsMatch = indents.match(/\t|( {1,4})/g);
-			const indentlevel0 = indentsMatch?.length ?? 0;
-			const prefix0 = MarkdownParser.generateQuotePrefix(indentlevel0);
-			if (prevBlankLines) {
-				output += `${prefix0}\n`;
+			const indentlevel0 = indentsMatch?.length ?? 0,
+				indentlevel1 = indentlevel0 + 1;
+			if (marker && !markerNum?.length) {
+				contentLevel = indentlevel1;
 			}
-			prevBlankLines = 0;
 
+			const _prevBlankLines = prevBlankLines;
+			prevBlankLines = 0;
+			let contentStr;
 			if (!marker) {
+				contentStr = content;
+			} else if (markerNum?.length && indentlevel0) {
+				contentStr = item;
+			}
+			if (contentStr !== undefined) {
 				const prefixI =
-					MarkdownParser.generateQuotePrefix(contentItemLevel);
+					MarkdownParser.generateQuotePrefix(contentLevel);
 				const prefixC =
-					indentlevel0 > contentItemLevel
+					indentlevel0 > contentLevel
 						? MarkdownParser.generateIndents(
-								indentlevel0 - contentItemLevel
+								indentlevel0 - contentLevel
 						  )
 						: "";
-				output += `${prefixI}${prefixC}${content}\n`;
+				if (_prevBlankLines) {
+					output.appendLine(prefixI);
+				}
+				output.appendLine(prefixI, prefixC, contentStr);
 				continue;
 			}
 
-			output += `${prefix0}\n`;
-			const indentlevel1 = indentlevel0 + 1;
-			const prefix1 = MarkdownParser.generateQuotePrefix(indentlevel1);
-
+			const prefix0 = MarkdownParser.generateQuotePrefix(indentlevel0),
+				prefix1 = MarkdownParser.generateQuotePrefix(indentlevel1);
+			output.appendLine(prefix0);
 			if (markerNum?.length) {
-				if (indentlevel0 === 0) {
-					let titleSupplier: (() => string) | undefined;
-					if (content.startsWith('"') && content.endsWith('"')) {
-						titleSupplier = () =>
-							`${prefix1}${calloutTypeMarkdown({
-								data_callout:
-									Constants.DATA_CALLOUT_FOLDER_GROUP,
-								data_callout_fold: "+",
-							})} ${content.substring(1, content.length - 1)}\n`;
-					} else {
-						const commands = content.trim().split(/[ \t]/);
-						for (
-							let i = 0, page: string;
-							i < commands.length;
-							i++
-						) {
-							switch (commands[i]) {
-								case "p":
-									page =
-										++i < commands.length
-											? commands[i]
-											: "?";
-									titleSupplier = () =>
-										`${prefix1}${calloutTypeMarkdown({
-											data_callout:
-												Constants.DATA_CALLOUT_FOLDER_PAGE,
-											data_callout_fold: "+",
-										})} ${page}\n`;
-									break;
-								default:
-									titleSupplier = () =>
-										`${prefix1}${calloutTypeMarkdown({
-											data_callout:
-												Constants.DATA_CALLOUT_FOLDER_GROUP,
-											data_callout_fold: "+",
-										})} ${content}\n`;
-									i = commands.length;
-									break;
-							}
+				let titleSupplier: (() => string) | undefined;
+				if (content.startsWith('"') && content.endsWith('"')) {
+					titleSupplier = () =>
+						`${prefix1}${calloutTypeMarkdown({
+							data_callout: Constants.DATA_CALLOUT_FOLDER_GROUP,
+							data_callout_fold: "+",
+						})} ${content.substring(1, content.length - 1)}`;
+				} else {
+					const commands = content.trim().split(/[ \t]/);
+					for (let i = 0, page: string; i < commands.length; i++) {
+						switch (commands[i]) {
+							case "p":
+								page =
+									++i < commands.length ? commands[i] : "?";
+								titleSupplier = () =>
+									`${prefix1}${calloutTypeMarkdown({
+										data_callout:
+											Constants.DATA_CALLOUT_FOLDER_PAGE,
+										data_callout_fold: "+",
+									})} ${page}`;
+								break;
+							default:
+								titleSupplier = () =>
+									`${prefix1}${calloutTypeMarkdown({
+										data_callout:
+											Constants.DATA_CALLOUT_FOLDER_GROUP,
+										data_callout_fold: "+",
+									})} ${content}`;
+								i = commands.length;
+								break;
 						}
 					}
-
-					if (titleSupplier) {
-						output += titleSupplier();
-					}
-					continue;
 				}
 
-				output += `${prefix0}${item}\n`;
+				if (titleSupplier) {
+					output.appendLine(titleSupplier());
+				}
 			} else {
-				contentItemLevel = indentlevel1;
 				const calloutType = `${Constants.DATA_CALLOUT_COMMENT}-${indentlevel0}`;
-				output += `${prefix1}[!${calloutType}]\n${prefix1}${content}\n`;
+				output.appendLine(`${prefix1}[!${calloutType}]`);
+				output.appendLine(prefix1, content);
 			}
 		}
 
-		return output.trimEnd();
+		return output.str.trimEnd();
 	}
 
 	private matchStart(markdown: string, startIndex: number) {
@@ -195,4 +192,20 @@ function calloutTypeMarkdown({
 			? data_callout + "|" + data_callout_metadata
 			: data_callout
 	}]${data_callout_fold ?? ""}`;
+}
+
+class StringBuilder {
+	private _str: string;
+
+	constructor(str = "") {
+		this._str = str;
+	}
+
+	get str() {
+		return this._str;
+	}
+
+	appendLine(...lineSubstrings: string[]) {
+		this._str = this._str.concat(...lineSubstrings, "\n");
+	}
 }
